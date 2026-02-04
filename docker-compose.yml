@@ -14,14 +14,13 @@ services:
       - "80:80"
     volumes:
       - ./web/static:/static
-    links:
-      - web:web
-
+    networks:
+      - frontend
+    security_opt:
+      - no-new-privileges:true
   web:
     restart: always
     build: ./web
-    links:
-      - postgres:postgres
     secrets:
       - postgres_user
       - postgres_password
@@ -37,13 +36,18 @@ services:
       - postgres
     command: >
       sh -c "python3 ./create_db.py &&
-             gunicorn -w 2 -b :8000 app:app"
-
+        gunicorn -w 2 -b 0.0.0.0:8000 app:app"
+    networks:
+      - frontend
+      - backend
+    security_opt:
+      - no-new-privileges:true
+   
   postgres:
     restart: always
-    image: postgres:latest
+    image: postgres:15-alpine
     volumes:
-      - db-data:/var/lib/postgresql
+      - db-data:/var/lib/postgresql/data
     secrets:
       - postgres_user
       - postgres_password
@@ -53,6 +57,15 @@ services:
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
     expose:
       - "5432"
-
+    networks:
+      - backend
+    security_opt:
+      - no-new-privileges:true
+   
 volumes:
   db-data:
+
+networks:
+  frontend:
+  backend:
+    internal: true
