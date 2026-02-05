@@ -21,28 +21,28 @@ services:
     
 
   web:
-    restart: always
-    build: ./web
-    user: "0:0"
-    secrets:
-      - postgres_user
-      - postgres_password
-    environment:
-      DEBUG: "False"
-      POSTGRES_DB: db
-      DATABASE_PORT: "5432"
-      POSTGRES_USER_FILE: /run/secrets/postgres_user
-      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
-    depends_on:
-      - postgres
-    command: >
-      sh -c "python3 ./create_db.py &&
-             exec gunicorn -w 2 -b 0.0.0.0:8000 app:app"
-    networks:
-      - frontend
-      - backend
-    security_opt:
-      - no-new-privileges:true
+      restart: always
+      build: ./web
+      secrets:
+        - postgres_user
+        - postgres_password
+      environment:
+        DEBUG: "False"
+        POSTGRES_DB: db
+        DATABASE_PORT: "5432"
+        POSTGRES_USER_FILE: /run/secrets/postgres_user
+        POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      depends_on:
+        - postgres
+      command: >
+        sh -c "python3 ./create_db.py &&
+              exec gunicorn -w 2 -b 0.0.0.0:8000 app:app"
+      networks:
+        - frontend
+        - backend
+      security_opt:
+        - no-new-privileges:true
+
 
 
 
