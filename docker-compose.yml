@@ -24,16 +24,8 @@ services:
     restart: always
     build: ./web
     secrets:
-      - source: postgres_user
-        target: postgres_user
-        uid: "1000"
-        gid: "1000"
-        mode: 0440
-      - source: postgres_password
-        target: postgres_password
-        uid: "1000"
-        gid: "1000"
-        mode: 0440
+      - postgres_user
+      - postgres_password
     environment:
       DEBUG: "False"
       POSTGRES_DB: db
@@ -44,12 +36,13 @@ services:
       - postgres
     command: >
       sh -c "python3 ./create_db.py &&
-             exec gunicorn -w 2 -b 0.0.0.0:8000 app:app"
+            exec gunicorn -w 2 -b 0.0.0.0:8000 app:app"
     networks:
       - frontend
       - backend
     security_opt:
       - no-new-privileges:true
+
 
 
   postgres:
